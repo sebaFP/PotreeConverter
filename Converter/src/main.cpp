@@ -32,6 +32,7 @@ Options parseArguments(int argc, char** argv) {
 	args.addArgument("projection", "Add the projection of the pointcloud to the metadata");
 	args.addArgument("generate-page,p", "Generate a ready to use web page with the given name");
 	args.addArgument("title", "Page title used when generating a web page");
+	args.addArgument("spacing-divisor", "Octree density divisor: spacing = bbox_x / divisor (default: 128). Lower = coarser/faster, higher = finer/slower. Try 32-64 when loading many clouds simultaneously.");
 
 	if (args.has("help")) {
 		cout << "PotreeConverter <source> -o <outdir>" << endl;
@@ -115,6 +116,7 @@ Options parseArguments(int argc, char** argv) {
 	bool keepChunks = args.has("keep-chunks");
 	bool noChunking = args.has("no-chunking");
 	bool noIndexing = args.has("no-indexing");
+	int spacingDivisor = args.get("spacing-divisor").as<int>(128);
 
 	Options options;
 	options.source = source;
@@ -132,6 +134,7 @@ Options parseArguments(int argc, char** argv) {
 	options.keepChunks = keepChunks;
 	options.noChunking = noChunking;
 	options.noIndexing = noIndexing;
+	options.spacingDivisor = spacingDivisor;
 
 	//cout << "flags: ";
 	//for (string flag : options.flags) {

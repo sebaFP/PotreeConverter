@@ -174,4 +174,9 @@ struct Options {
 	bool noChunking = false;
 	bool noIndexing = false;
 
+	// Controls octree density: spacing = bbox_x / spacingDivisor.
+	// Higher = finer octree (more points per node, more LOD levels) — default 128.
+	// Lower  = coarser octree (fewer points per node, faster rendering).
+	// Recommended: 128 (single cloud), 64 (a few clouds), 32 (many clouds).
+	int spacingDivisor = 128;
 };

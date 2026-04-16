@@ -1571,7 +1571,7 @@ void doIndexing(string targetDir, State& state, Options& options, Sampler& sampl
 	indexer.options = options;
 	indexer.attributes = attributes;
 	indexer.root = make_shared<Node>("r", chunks->min, chunks->max);
-	indexer.spacing = (chunks->max - chunks->min).x / 128.0;
+	indexer.spacing = (chunks->max - chunks->min).x / (double)options.spacingDivisor;
 
 	auto onNodeCompleted = [&indexer](Node* node) {
 		indexer.writer->writeAndUnload(node);
