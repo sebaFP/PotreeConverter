@@ -1,6 +1,5 @@
 
 #include <cerrno>
-#include <execution>
 #include <algorithm>
 
 #include "indexer.h"
@@ -1516,43 +1515,7 @@ void Writer::writeAndUnload(Node* node) {
 }
 
 void Writer::launchWriterThread() {
-	thread([&]() {
-
-		while (true) {
-
-			shared_ptr<Buffer> buffer = nullptr;
-
-			{
-				lock_guard<mutex> lock(mtx);
-
-				if (backlog.size() > 0) {
-					buffer = backlog.front();
-					backlog.pop_front();
-				} else if (backlog.size() == 0 && closeRequested) {
-					// DONE! No more work and close requested. quit thread.
-
-					cvClose.notify_one();
-
-					break;
-				}
-			}
-
-			if (buffer != nullptr) {
-				int64_t numBytes = buffer->pos;
-				indexer->bytesWritten += numBytes;
-				indexer->bytesToWrite -= numBytes;
-
-				fsOctree.write(buffer->data_char, numBytes);
-
-				indexer->bytesInMemory -= numBytes;
-			} else {
-				using namespace std::chrono_literals;
-				std::this_thread::sleep_for(10ms);
-			}
-			
-		}
-
-	}).detach();
+	// No-op: WASM build is single-threaded; flushing happens in closeAndWait()
 }
 
 void Writer::closeAndWait() {
@@ -1560,16 +1523,24 @@ void Writer::closeAndWait() {
 		return;
 	}
 
-	unique_lock<mutex> lock(mtx);
 	if (activeBuffer != nullptr) {
 		backlog.push_back(activeBuffer);
+		activeBuffer = nullptr;
 	}
 
+	// Flush all buffered data synchronously (WASM single-threaded build)
+	for (auto& buffer : backlog) {
+		int64_t numBytes = buffer->pos;
+		indexer->bytesWritten += numBytes;
+		indexer->bytesToWrite -= numBytes;
+		fsOctree.write(buffer->data_char, numBytes);
+		indexer->bytesInMemory -= numBytes;
+	}
+	backlog.clear();
+
 	closeRequested = true;
-	cvClose.wait(lock);
-
 	fsOctree.close();
-
+	closed = true;
 }
 
 

@@ -1,8 +1,6 @@
 
 
 #include <iostream>
-#include <execution>
-
 #include "unsuck/unsuck.hpp"
 #include "chunker_countsort_laszip.h"
 #include "indexer.h"
@@ -79,7 +77,7 @@ Options parseArguments(int argc, char** argv) {
 			exit(123);
 		} 
 
-		path = fs::canonical(path);
+		path = path;
 
 		string suggestedBaseName = path.filename().string() + "_converted";
 		outdir = sourcepath + "/../" + suggestedBaseName;
@@ -100,7 +98,7 @@ Options parseArguments(int argc, char** argv) {
 
 	}
 
-	outdir = fs::weakly_canonical(fs::path(outdir)).string();
+	outdir = "/output";
 
 	//vector<string> flags = args.get("flags").as<vector<string>>();
 
@@ -180,8 +178,8 @@ Curated curateSources(vector<string> paths) {
 	sources.reserve(paths.size());
 
 	mutex mtx;
-	auto parallel = std::execution::par;
-	for_each(parallel, paths.begin(), paths.end(), [&mtx, &sources](string path) {
+	
+	std::for_each(paths.begin(), paths.end(), [&mtx, &sources](string path) {
 
 		auto header = loadLasHeader(path);
 		auto filesize = fs::file_size(path);
@@ -494,7 +492,8 @@ void generatePage(string exePath, string pagedir, string pagename) {
 
 #include "HierarchyBuilder.h"
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) { std::cerr << "ENTER MAIN" << std::endl; std::cout << "ENTER MAIN" << std::endl;
+try {
 
 	
 	// { // DEBUG STUFF
@@ -512,14 +511,14 @@ int main(int argc, char** argv) {
 
 	double tStart = now(); 
 
-	auto exePath = fs::canonical(fs::absolute(argv[0])).parent_path().string();
+	auto exePath = std::string(".");
 
 	launchMemoryChecker(2 * 1024, 0.1);
 	auto cpuData = getCpuData();
 
 	cout << "#threads: " << cpuData.numProcessors << endl;
 
-	auto options = parseArguments(argc, argv);
+	std::cout << "BEFORE PARSE" << std::endl; auto options = parseArguments(argc, argv); std::cout << "AFTER PARSE" << std::endl;
 
 	auto [name, sources] = curateSources(options.source);
 	if (options.name.size() == 0) {
@@ -566,4 +565,5 @@ int main(int argc, char** argv) {
 
 
 	return 0;
+} catch (std::exception& e) { std::cerr << "[C++ FATAL EXCEPTION] " << e.what() << std::endl; return 1; } catch (...) { std::cerr << "[C++ FATAL EXCEPTION UNKNOWN]" << std::endl; return 1; }
 }

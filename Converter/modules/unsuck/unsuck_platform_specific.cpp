@@ -357,4 +357,18 @@ CpuData getCpuData() {
 }
 
 
+#else
+
+// WASM / Emscripten: no-op stubs, single-threaded
+CpuData getCpuData() {
+	CpuData d;
+	d.numProcessors = 1;
+	d.usage = 0;
+	return d;
+}
+MemoryData getMemoryData() {
+	return {0, 0, 0, 0, 0, 0, 0, 0};
+}
+void launchMemoryChecker(int64_t maxMB, double checkInterval) {}
+
 #endif

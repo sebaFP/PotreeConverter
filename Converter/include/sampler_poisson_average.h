@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <execution>
-
 #include "structures.h"
 #include "Attributes.h"
 
@@ -280,8 +278,7 @@ struct SamplerPoissonAverage : public Sampler {
 
 			};
 
-			auto parallel = std::execution::par_unseq;
-			std::sort(parallel, points.begin(), points.end(), [center](Point a, Point b) -> bool {
+			std::sort(points.begin(), points.end(), [center](Point a, Point b) -> bool {
 
 				auto ax = a.x - center.x;
 				auto ay = a.y - center.y;

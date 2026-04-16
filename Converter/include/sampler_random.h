@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <execution>
-
 #include "structures.h"
 #include "Attributes.h"
 
