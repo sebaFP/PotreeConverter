@@ -9,7 +9,8 @@
 struct SamplerRandom : public Sampler {
 
 	// subsample a local octree from bottom up
-	void sample(Node* node, Attributes attributes, double baseSpacing, 
+	void sample(Node* node, Attributes attributes, double baseSpacing,
+		double levelFactor,
 		function<void(Node*)> onNodeCompleted,
 		function<void(Node*)> onNodeDiscarded
 	) {

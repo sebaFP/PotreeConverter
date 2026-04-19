@@ -9,7 +9,8 @@
 struct SamplerPoissonAverage : public Sampler {
 
 	// subsample a local octree from bottom up
-	void sample(Node* node, Attributes attributes, double baseSpacing, 
+	void sample(Node* node, Attributes attributes, double baseSpacing,
+		double levelFactor,
 		function<void(Node*)> onNodeCompleted,
 		function<void(Node*)> onNodeDiscarded
 	) {
@@ -45,7 +46,7 @@ struct SamplerPoissonAverage : public Sampler {
 		Vector3 scale = attributes.posScale;
 		Vector3 offset = attributes.posOffset;
 
-		traversePost(node, [bytesPerPoint, baseSpacing, scale, offset, &onNodeCompleted, &attributes](Node* node) {
+		traversePost(node, [bytesPerPoint, baseSpacing, levelFactor, scale, offset, &onNodeCompleted, &attributes](Node* node) {
 			node->sampled = true;
 
 			int64_t numPoints = node->numPoints;
@@ -157,7 +158,7 @@ struct SamplerPoissonAverage : public Sampler {
 
 			//thread_local vector<Point> dbgAccepted(1'000'000);
 			//int dbgNumAccepted = 0;
-			double spacing = baseSpacing / pow(2.0, node->level());
+			double spacing = baseSpacing / pow(levelFactor, node->level());
 			double squaredSpacing = spacing * spacing;
 
 			auto squaredDistance = [](Point& a, Point& b) {

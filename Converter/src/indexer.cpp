@@ -1639,7 +1639,7 @@ void doIndexing(string targetDir, State& state, Options& options, Sampler& sampl
 
 		buildHierarchy(&indexer, chunkRoot.get(), pointBuffer, numPoints);
 
-		sampler.sample(chunkRoot.get(), attributes, indexer.spacing, onNodeCompleted, onNodeDiscarded);
+		sampler.sample(chunkRoot.get(), attributes, indexer.spacing, indexer.options.levelFactor, onNodeCompleted, onNodeDiscarded);
 
 		// detach anything below the chunk root. Will be reloaded from
 		// temporarily flushed hierarchy during creation of the hierarchy file
@@ -1696,7 +1696,7 @@ void doIndexing(string targetDir, State& state, Options& options, Sampler& sampl
 				fcr.node->points = buffer;
 			}
 
-			sampler.sample(task.node, attributes, indexer.spacing, onNodeCompleted, onNodeDiscarded);
+			sampler.sample(task.node, attributes, indexer.spacing, indexer.options.levelFactor, onNodeCompleted, onNodeDiscarded);
 
 			task.node->children.clear();
 		}
@@ -1709,7 +1709,7 @@ void doIndexing(string targetDir, State& state, Options& options, Sampler& sampl
 
 		indexer.root = node;
 	} else if (!indexer.root->sampled){
-		sampler.sample(indexer.root.get(), attributes, indexer.spacing, onNodeCompleted, onNodeDiscarded);
+		sampler.sample(indexer.root.get(), attributes, indexer.spacing, indexer.options.levelFactor, onNodeCompleted, onNodeDiscarded);
 	}
 
 	// root is automatically finished after subsampling all descendants

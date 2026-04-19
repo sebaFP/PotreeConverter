@@ -33,6 +33,7 @@ Options parseArguments(int argc, char** argv) {
 	args.addArgument("generate-page,p", "Generate a ready to use web page with the given name");
 	args.addArgument("title", "Page title used when generating a web page");
 	args.addArgument("spacing-divisor", "Octree density divisor: spacing = bbox_x / divisor (default: 128). Lower = coarser/faster, higher = finer/slower. Try 32-64 when loading many clouds simultaneously.");
+	args.addArgument("level-factor", "Exponential spacing factor per octree level: spacing = baseSpacing / pow(factor, level). Default 2.0. Use 4.0 for 500+ clouds to produce shallower trees.");
 
 	if (args.has("help")) {
 		cout << "PotreeConverter <source> -o <outdir>" << endl;
@@ -117,6 +118,7 @@ Options parseArguments(int argc, char** argv) {
 	bool noChunking = args.has("no-chunking");
 	bool noIndexing = args.has("no-indexing");
 	int spacingDivisor = args.get("spacing-divisor").as<int>(128);
+	double levelFactor = args.get("level-factor").as<double>(2.0);
 
 	Options options;
 	options.source = source;
@@ -135,6 +137,7 @@ Options parseArguments(int argc, char** argv) {
 	options.noChunking = noChunking;
 	options.noIndexing = noIndexing;
 	options.spacingDivisor = spacingDivisor;
+	options.levelFactor = levelFactor;
 
 	//cout << "flags: ";
 	//for (string flag : options.flags) {

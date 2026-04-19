@@ -179,4 +179,5 @@ struct Options {
 	// Lower  = coarser octree (fewer points per node, faster rendering).
 	// Recommended: 128 (single cloud), 64 (a few clouds), 32 (many clouds).
 	int spacingDivisor = 128;
+	double levelFactor = 2.0;  // spacing = baseSpacing / pow(levelFactor, level)
 };
